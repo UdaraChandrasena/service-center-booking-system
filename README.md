@@ -5,7 +5,7 @@
 
 A comprehensive service booking and management platform for **S.M. Chandrasena Service Center**. This application enables customers to schedule vehicle maintenance, view services, and leave feedback, all through an intuitive web interface. 
 
-## 🌟 Features
+##  Features
 
 *   **User Authentication:** Secure login and sign-up functionality for customers.
 *   **Service Booking:** Easily schedule appointments for various services, including:
@@ -20,13 +20,13 @@ A comprehensive service booking and management platform for **S.M. Chandrasena S
 *   **Responsive UI:** A clean, modern, and mobile-friendly frontend design.
 *   **Integrated Database:** Robust data management for users and bookings.
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 *   **Frontend:** HTML5, CSS3, Vanilla JavaScript
 *   **Database:** MySQL
 *   **Backend:** (Integration placeholder based on architecture)
 
-## 📂 Project Structure
+##  Project Structure
 
 ```text
 service-center-app/
@@ -43,7 +43,7 @@ service-center-app/
 └── README.md             # Project documentation
 ```
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 
@@ -66,7 +66,7 @@ service-center-app/
     *   Simply open `frontend/index.html` in your web browser to start exploring the application.
     *   *Note: For full functionality, ensure the backend services are running and properly connected.*
 
-## 📞 Contact
+##  Contact
 
 For appointments or support, please contact:
 *   **Phone:** 070 178 0711 | 071 385 1137 | 074 071 9071
