@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - S.M. Service Center</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .show-pw { display: flex; align-items: center; color: white; font-size: 13px; margin: 5px 0 15px 0; width: 80%; }
+        .show-pw input { width: auto; margin-right: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="overlay">
+        <div class="main-container">
+            <h2>USER LOGIN</h2>
+            <input type="email" id="login-email" placeholder="Email Address" class="input-field">
+            <input type="password" id="login-password" placeholder="Password" class="input-field">
+            
+            <div class="show-pw">
+                <input type="checkbox" onclick="document.getElementById('login-password').type = this.checked ? 'text' : 'password'">
+                <label>Show Password</label>
+            </div>
+
+            <button class="btn" onclick="login()">LOG IN</button>
+            <p style="color: rgb(151, 100, 100); margin-top: 15px;">New here? <a href="signup.html" style="color: #ffcc00;">Create Account</a></p>
+        </div>
+    </div>
+    <script>
+        function login() {
+            let email = document.getElementById("login-email").value;
+            let pass = document.getElementById("login-password").value;
+            let users = JSON.parse(localStorage.getItem("allUsers") || "[]");
+            let user = users.find(u => u.email === email && u.pass === pass);
+            if (user) {
+                localStorage.setItem("loggedUserEmail", email);
+                window.location.href = "selection.html";
+            } else { alert("Invalid Email or Password!"); }
+        }
+    </script>
+</body>
+</html>

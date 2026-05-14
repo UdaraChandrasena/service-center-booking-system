@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S.M. Chandrasena Service Center</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .main-container { display: flex; flex-direction: column; align-items: center; padding-bottom: 50px; }
+        .motto-container { margin: 25px 0; text-align: center; border-top: 1px dashed #ccc; border-bottom: 1px dashed #ccc; padding: 15px 0; width: 100%; }
+        .motto-text { font-family: 'Georgia', serif; font-size: 1.4rem; font-style: italic; font-weight: bold; color: #004a99; margin: 0; }
+        .motto-text::before, .motto-text::after { content: " ★ "; color: #ffcc00; }
+        .services-box, .contact-section { width: 90%; max-width: 500px; margin-bottom: 25px; }
+
+        /* Rating Section Styles */
+        .rating-display-box { 
+            background: rgba(255, 255, 255, 0.95); 
+            border-radius: 15px; 
+            padding: 20px; 
+            width: 90%; 
+            max-width: 500px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .review-item { 
+            border-bottom: 1px solid #eee; 
+            padding: 10px 0; 
+            text-align: left;
+        }
+        .review-item:last-child { border-bottom: none; }
+        .star-color { color: #ffcc00; font-size: 18px; }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="logo-section">
+            <img src="images/logo.png" alt="S.M. Chandrasena Logo">
+        </div>
+        <h2 class="main-title">S.M. CHANDRASENA SERVICE CENTER</h2>
+
+        <div class="btn-container">
+            <button class="btn" onclick="location.href='login.html'">LOG IN</button>
+            <button class="btn" onclick="location.href='signup.html'" style="background: #666;">SIGN UP</button>
+            <button class="btn" onclick="location.href='gallery.html'" style="background: #28a745;">VIEW GALLERY</button> 
+        </div>
+
+        <div class="services-box">
+            <h5>OUR SERVICES</h5>
+            <ul class="service-list">
+                <li>Periodic Maintenance</li>
+                <li>Engine Diagnostics</li>
+                <li>Tire Service & Wheel Alignment</li>
+                <li>Brake System Repair</li>
+                <li>Vehicle Wash & Detailing</li>
+                <li>Oil change</li>
+                <li>Battery replacement</li>
+                <li>Electrical repairs</li>
+                <li>Spare parts replacement</li>
+                <li>Customer support</li>
+            </ul>
+            <div class="motto-container">
+                <p class="motto-text">Where Quality Meets Care</p>
+            </div>
+        </div>
+
+        <div class="contact-section">
+            <span class="contact-label">Contact Us for Appointments</span>
+            <p class="contact-info">📞 070 178 0711 | 📞 071 385 1137 | 📞 0740719071</p>
+        </div>
+
+        <div class="rating-display-box">
+            <h5 style="color: #004a99; margin-top: 0;">WHAT OUR CUSTOMERS SAY</h5>
+            <div id="feedback-display">
+                </div>
+            <button class="btn" style="background: #ffcc00; color: #333; width: auto; margin-top: 15px; font-size: 14px;" onclick="location.href='rating.html'">RATE US</button>
+        </div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            // LocalStorage එකෙන් Feedback දත්ත ලබා ගැනීම
+            let feedbacks = JSON.parse(localStorage.getItem("allFeedbacks") || "[]");
+            const display = document.getElementById('feedback-display');
+
+            if (feedbacks.length === 0) {
+                display.innerHTML = "<p style='color: #888; font-style: italic;'>No reviews yet. Be the first to rate us!</p>";
+            } else {
+                // අන්තිමට ලැබුණු ප්‍රතිචාර 3ක් පෙන්වීම (Reverse කර අලුත් ඒවා උඩට ගැනීම)
+                feedbacks.slice(-3).reverse().forEach(fb => {
+                    let stars = "★".repeat(fb.rating) + "☆".repeat(5 - fb.rating);
+                    display.innerHTML += `
+                        <div class="review-item">
+                            <div class="star-color">${stars}</div>
+                            <p style="margin: 5px 0; font-size: 0.95rem; color: #333;">"${fb.comment || 'No comment'}"</p>
+                            <small style="color: #999;">${fb.date}</small>
+                        </div>`;
+                });
+            }
+        };
+    </script>
+</body>
+</html>

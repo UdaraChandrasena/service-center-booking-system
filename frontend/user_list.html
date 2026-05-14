@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Users</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-box { background: white; padding: 20px; border-radius: 15px; width: 95%; margin: auto; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        th { background: #28a745; color: white; }
+    </style>
+</head>
+<body>
+    <div class="overlay" style="padding-top: 30px;">
+        <div class="admin-box">
+            <h2 style="color: #28a745;">REGISTERED CUSTOMERS</h2>
+            <table>
+                <thead>
+                    <tr><th>Name</th><th>Email</th><th>Phone</th></tr>
+                </thead>
+                <tbody id="userTable"></tbody>
+            </table>
+            <button class="btn" onclick="location.href='selection.html'" style="margin-top: 20px;">Back</button>
+        </div>
+    </div>
+    <script>
+        window.onload = function() {
+            let users = JSON.parse(localStorage.getItem("allUsers") || "[]");
+            document.getElementById("userTable").innerHTML = users.map(u => 
+                `<tr><td>${u.fname}</td><td>${u.email}</td><td>${u.phone}</td></tr>`
+            ).join("");
+        }
+    </script>
+</body>
+</html>

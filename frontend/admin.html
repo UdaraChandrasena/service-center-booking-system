@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - S.M. Management Panel</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-box { background: white; padding: 30px; border-radius: 20px; width: 95%; max-width: 1200px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin: 20px auto; overflow-x: auto; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .tab-btn { padding: 10px 20px; cursor: pointer; border: none; background: #ddd; border-radius: 5px; font-weight: bold; }
+        .tab-btn.active { background: #004a99; color: white; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; }
+        th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; font-size: 13px; }
+        th { background-color: #004a99; color: white; text-transform: uppercase; }
+        tr.completed { background-color: #d4edda !important; opacity: 0.7; }
+        
+        .status-btn { padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; }
+        .pending-btn { background: #ffc107; color: #000; }
+        .done-btn { background: #28a745; color: #fff; }
+        .clear-btn { background: #d93025; color: white; }
+        
+        .badge { padding: 3px 8px; border-radius: 4px; background: #eef; color: #004a99; font-size: 11px; }
+    </style>
+</head>
+<body>
+    <div class="overlay" style="overflow-y: auto; height: 100vh;">
+        <div class="admin-box">
+            <h2 style="color: #004a99; text-align: center;">S.M. OWNER MANAGEMENT PANEL</h2>
+            
+            <div class="tabs">
+                <button class="tab-btn active" onclick="showTab('bookings')">Service Bookings</button>
+                <button class="tab-btn" onclick="showTab('orders')">Product Orders</button>
+            </div>
+
+            <div id="tab-bookings">
+                <h4>Recent Service Appointments</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date/Time</th>
+                            <th>Vehicle No</th>
+                            <th>Services</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookingTableBody"></tbody>
+                </table>
+            </div>
+
+            <div id="tab-orders" style="display: none;">
+                <h4>Recent Product Orders</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Customer/Phone</th>
+                            <th>Address</th>
+                            <th>Items Ordered</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orderTableBody"></tbody>
+                </table>
+            </div>
+            
+            <div style="margin-top: 30px; text-align: center;">
+                <button class="btn" onclick="window.location.href='index.html'">Home</button>
+                <button class="btn clear-btn" onclick="clearAllData()">Reset All Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tab) {
+            document.getElementById('tab-bookings').style.display = tab === 'bookings' ? 'block' : 'none';
+            document.getElementById('tab-orders').style.display = tab === 'orders' ? 'block' : 'none';
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        window.onload = function() {
+            loadBookings();
+            loadOrders();
+        };
+
+        // --- Bookings Management ---
+        function loadBookings() {
+            let bookings = JSON.parse(localStorage.getItem("allBookings") || "[]");
+            let tbody = document.getElementById("bookingTableBody");
+            tbody.innerHTML = "";
+
+            if(bookings.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>No bookings found.</td></tr>";
+                return;
+            }
+
+            bookings.reverse().forEach((b, index) => {
+                let isDone = b.status === "Completed";
+                tbody.innerHTML += `
+                    <tr class="${isDone ? 'completed' : ''}">
+                        <td><strong>${b.date}</strong><br><span class="badge">${b.time}</span></td>
+                        <td>${b.vehicle}</td>
+                        <td>${Array.isArray(b.services) ? b.services.join(", ") : b.service}</td>
+                        <td><span class="status-btn ${isDone ? 'done-btn' : 'pending-btn'}">${isDone ? 'COMPLETED' : 'PENDING'}</span></td>
+                        <td>
+                            <button onclick="toggleStatus('booking', ${bookings.length - 1 - index})" class="status-btn done-btn">✔</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        // --- Orders Management ---
+        function loadOrders() {
+            let orders = JSON.parse(localStorage.getItem("smFinalOrders") || "[]");
+            let tbody = document.getElementById("orderTableBody");
+            tbody.innerHTML = "";
+
+            if(orders.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='6' style='text-align:center;'>No orders found.</td></tr>";
+                return;
+            }
+
+            orders.reverse().forEach((o, index) => {
+                let isDone = o.status === "Completed";
+                tbody.innerHTML += `
+                    <tr class="${isDone ? 'completed' : ''}">
+                        <td><strong>${o.name}</strong><br>${o.phone}</td>
+                        <td>${o.addr}</td>
+                        <td><span style="color:#004a99;">${o.items.map(i => i.name).join(", ")}</span></td>
+                        <td>Rs. ${o.total}</td>
+                        <td><span class="status-btn ${isDone ? 'done-btn' : 'pending-btn'}">${isDone ? 'SHIPPED' : 'PENDING'}</span></td>
+                        <td>
+                            <button onclick="toggleStatus('order', ${orders.length - 1 - index})" class="status-btn done-btn">✔</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        // Status එක මාරු කිරීම (Mark as Done)
+        function toggleStatus(type, index) {
+            if (type === 'booking') {
+                let data = JSON.parse(localStorage.getItem("allBookings"));
+                data[index].status = data[index].status === "Completed" ? "Pending" : "Completed";
+                localStorage.setItem("allBookings", JSON.stringify(data));
+                loadBookings();
+            } else {
+                let data = JSON.parse(localStorage.getItem("smFinalOrders"));
+                data[index].status = data[index].status === "Completed" ? "Pending" : "Completed";
+                localStorage.setItem("smFinalOrders", JSON.stringify(data));
+                loadOrders();
+            }
+        }
+
+        function clearAllData() {
+            if (confirm("වැදගත්: සියලුම දත්ත මකා දැමීමට ඔබට විශ්වාසද?")) {
+                localStorage.removeItem("allBookings");
+                localStorage.removeItem("smFinalOrders");
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>

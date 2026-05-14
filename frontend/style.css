@@ -1,0 +1,340 @@
+/* --- මූලික සැකසුම් --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+body {
+    background: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)), 
+                url('images/garage_bg.jpg') no-repeat center center fixed;
+    background-size: cover;
+    min-height: 100vh; /* height වෙනුවට min-height දාන්න */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-y: auto; /* hidden වෙනුවට auto දාන්න එවිට scroll කළ හැක */
+    padding: 20px 0; /* උඩ සහ පහළ පොඩි ඉඩක් තැබීමට */
+}
+
+.overlay {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    margin: 40px auto; /* උඩින් සහ පහළින් 40px ඉඩක් තබා මැදට ගනී */
+    animation: fadeInPage 0.8s ease-out;
+}
+
+@keyframes fadeInPage {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- ලෝගෝව --- */
+.page-logo {
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 20px;
+    animation: logoBounce 1.5s ease-in-out;
+}
+
+@keyframes logoBounce {
+    0% { transform: scale(0.8); opacity: 0; }
+    60% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); }
+}
+
+h2 {
+    font-weight: bold;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+}
+
+/* --- Input Fields --- */
+.input-field {
+    width: 350px;
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    display: block;
+    outline: none;
+    background: white;
+}
+
+/* --- බොත්තම් (Buttons) --- */
+.btn-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px; /* බොත්තම් අතර පරතරය */
+    flex-wrap: wrap;
+    margin-bottom: 30px; /* Services වලට උඩින් ඉඩ ලබා ගැනීමට */
+}
+
+.btn {
+    background: #004a99;
+    color: white;
+    border: none;
+    padding: 14px 45px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: 0.3s;
+    min-width: 160px;
+}
+
+.btn:hover {
+    background: #003366;
+    transform: scale(1.05);
+}
+
+.link {
+    color: #004a99;
+    font-weight: bold;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.link:hover {
+    text-decoration: underline;
+}
+
+/* --- Error Text (Login/Signup සඳහා) --- */
+.error-text {
+    color: #d93025;
+    background: rgba(217, 48, 37, 0.1);
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    display: none;
+    width: 350px;
+    border: 1px solid #d93025;
+    text-align: center;
+}
+
+/* --- සේවා ලැයිස්තුව (Services Box) --- */
+.services-box {
+    background: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 15px;
+    width: 100%;
+    max-width: 500px;
+}
+
+.service-list {
+    list-style: none;
+    text-align: left;
+    display: inline-block;
+    margin-top: 10px;
+}
+
+.service-list li::before {
+    content: "•";
+    color: #004a99;
+    font-weight: bold;
+    display: inline-block;
+    width: 1em;
+}
+
+/* --- Gallery සැකසුම් --- */
+.gallery-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    margin-top: 20px;
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 15px;
+    transition: 0.4s;
+    cursor: pointer;
+    border: 3px solid white;
+}
+
+.gallery-item img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+/* --- Confirmation Card (Receipt) --- */
+.confirm-card {
+    background: white;
+    padding: 35px;
+    border-radius: 25px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+    max-width: 450px;
+    animation: popUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popUp {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.success-icon {
+    font-size: 55px;
+    color: #4CAF50;
+    margin-bottom: 10px;
+}
+
+.details-box {
+    text-align: left;
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 15px;
+    margin: 20px 0;
+    border: 1px dashed #004a99;
+}
+
+.details-box p {
+    margin: 8px 0;
+    font-size: 16px;
+}
+.gallery-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* 250 වෙනුවට 200 දාලා බලන්න */
+    gap: 15px;
+    width: 100%;
+    max-height: 500px; /* ලිස්ට් එක දිග වැඩි නම් මේක උදව් වෙනවා */
+    overflow-y: auto;
+    padding: 10px;
+}
+/* --- Contact Section --- */
+.contact-section {
+    margin-top: 30px;
+    padding: 15px;
+    background: rgba(0, 74, 153, 0.1); /* ලා නිල් පාට පසුබිමක් */
+    border-radius: 15px;
+    width: 100%;
+    max-width: 500px;
+}
+
+.contact-info {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #004a99;
+    margin: 5px 0;
+}
+
+.contact-label {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    color: #555;
+    display: block;
+    margin-bottom: 5px;
+}
+.password-wrapper {
+    position: relative;
+    width: 350px;
+    margin: 8px auto;
+}
+
+.password-wrapper .input-field {
+    width: 100%;
+    margin: 0;
+    padding-right: 50px; /* View බොත්තමට ඉඩ තැබීමට */
+}
+
+.toggle-password {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 14px;
+    color: #004a99;
+    font-weight: bold;
+    user-select: none;
+}
+/* --- Rating System Styles --- */
+.rating-box {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.stars {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    font-size: 35px;
+    cursor: pointer;
+    color: #ccc; /* සාමාන්‍යයෙන් අළු පාටින් පෙනේ */
+}
+
+.stars span:hover,
+.stars span.active {
+    color: #ffcc00; /* තෝරාගත් විට රන්වන් පාට වේ */
+    transform: scale(1.2);
+    transition: 0.2s;
+}
+
+.rating-msg {
+    font-size: 14px;
+    color: #555;
+    margin-top: 10px;
+}
+/* පේජ් එකේ මැද කොටස පිළිවෙළට තබා ගැනීමට */
+.main-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px; /* කොටස් අතර ලස්සන පරතරයක් තබයි */
+    padding-bottom: 50px; /* යටම කොටස පෙනීමට ඉඩ තබයි */
+}
+
+/* සේවා බොක්ස් එක සහ රේටින් බොක්ස් එක සමානව තබා ගැනීමට */
+.services-box {
+    width: 90%;
+    max-width: 500px;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.contact-section {
+    width: 90%;
+    max-width: 500px;
+    margin: 10px 0;
+}
+/* Motto එක සඳහා විශේෂිත ස්ටයිල් */
+.motto-container {
+    margin: 20px 0;
+    text-align: center;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    padding: 15px 0;
+}
+
+.motto-text {
+    font-family: 'Georgia', serif; /* ලස්සන පැරණි පෙනුමක් ඇති ෆොන්ට් එකක් */
+    font-size: 1.2rem;
+    font-style: italic;
+    font-weight: bold;
+    color: #004a99; /* සර්විස් සෙන්ටර් එකේ නිල් පාට */
+    letter-spacing: 1px;
+    position: relative;
+    display: inline-block;
+}
+
+.motto-text::before, .motto-text::after {
+    content: " • ";
+    color: #ffcc00; /* තරු වල රන්වන් පාට */
+    font-size: 1.5rem;
+}

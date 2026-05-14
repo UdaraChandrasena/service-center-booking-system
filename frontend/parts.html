@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S.M. Parts Store - Smart Billing & Rating</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .store-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 20px; }
+        @media (max-width: 1100px) { .store-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { .store-grid { grid-template-columns: 1fr; } }
+        
+        .product-card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; position: relative; }
+        .product-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 8px; }
+        
+        /* Star Rating Styles */
+        .rating-stars { color: #ccc; cursor: pointer; font-size: 18px; margin: 5px 0; display: inline-block; }
+        .rating-stars span.active { color: #ffcc00; }
+        .rating-count { font-size: 11px; color: #777; margin-left: 5px; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 3000; justify-content: center; align-items: center; overflow-y: auto; }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 90%; max-width: 500px; position: relative; }
+        
+        /* Invoice Box */
+        .invoice-box { padding: 20px; border: 1px solid #eee; text-align: left; }
+        .invoice-header { display: flex; justify-content: space-between; border-bottom: 2px solid #004a99; padding-bottom: 10px; margin-bottom: 15px; }
+        .invoice-logo { width: 70px; }
+
+        .admin-panel { background: #f1f1f1; padding: 30px; margin: 40px auto; border-radius: 15px; width: 90%; display: none; border: 3px solid #004a99; }
+        .remove-btn { color: red; cursor: pointer; font-weight: bold; border: none; background: none; margin-left: 10px; }
+        .clear-cart-btn { background: #ff4d4d; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="overlay" style="overflow-y: auto; height: 100vh;">
+        <h2 style="color: #000; text-align: center; padding: 20px;">S.M. CHANDRASENA SPARE PARTS STORE</h2>
+        
+        <div style="text-align: right; padding: 0 40px;">
+            <button class="btn" style="background: #f1c40f; color: #000; width: auto;" onclick="openCart()">🛒 VIEW CART (<span id="cart-count">0</span>)</button>
+        </div>
+
+        <div id="product-display" class="store-grid"></div>
+
+        <div id="cartModal" class="modal">
+            <div class="modal-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="color: #004a99; margin: 0;">Checkout Details</h3>
+                    <button class="clear-cart-btn" onclick="clearCart()">🗑️ Clear Cart</button>
+                </div>
+                
+                <div id="cart-items-list" style="max-height: 150px; overflow-y: auto; margin-bottom: 10px; border-bottom: 1px solid #eee;"></div>
+                
+                <div style="text-align: left; margin: 10px 0;">
+                    <input type="text" id="cust-name" placeholder="Receiver's Name" class="input-field">
+                    <input type="tel" id="cust-phone" placeholder="Contact Number" class="input-field">
+                    <textarea id="cust-address" placeholder="Delivery Address" class="input-field" style="height: 60px;"></textarea>
+                    
+                    <div style="background: #f9f9f9; padding: 10px; border-radius: 10px; margin-top: 10px;">
+                        <p style="margin: 5px 0;">Subtotal: Rs. <span id="items-subtotal">0</span></p>
+                        <p style="margin: 5px 0; font-size: 14px; color: #666;">Delivery Fee: Rs. <span id="bill-shipping">0</span></p>
+                        <h3 style="color: #f85606; margin: 5px 0;">Grand Total: Rs. <span id="bill-total">0</span></h3>
+                    </div>
+                </div>
+                <button class="btn" style="background: #28a745;" onclick="processOrder()">PLACE ORDER & VIEW BILL</button>
+                <button class="btn" style="background: #666; margin-top: 10px;" onclick="closeModal('cartModal')">CLOSE</button>
+            </div>
+        </div>
+
+        <div id="invoiceModal" class="modal">
+            <div class="modal-content invoice-box">
+                <div class="invoice-header">
+                    <div>
+                        <img src="images/logo.png" class="invoice-logo" alt="Logo">
+                        <h4 style="margin:0;">S.M. CHANDRASENA</h4>
+                        <small>Service Center & Spare Parts</small>
+                    </div>
+                    <div style="text-align: right;">
+                        <h2 style="margin:0; color:#004a99;">INVOICE</h2>
+                        <small id="inv-date"></small>
+                    </div>
+                </div>
+                
+                <div style="margin: 15px 0;">
+                    <strong>Bill To:</strong>
+                    <p id="inv-cust-details" style="margin: 5px 0; font-size: 13px;"></p>
+                </div>
+
+                <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                    <thead style="background: #f4f4f4;">
+                        <tr><th style="padding: 5px; border: 1px solid #ddd;">Item</th><th style="padding: 5px; border: 1px solid #ddd; text-align: right;">Price</th></tr>
+                    </thead>
+                    <tbody id="inv-items"></tbody>
+                </table>
+
+                <div style="text-align: right; margin-top: 10px;">
+                    <p style="margin: 2px 0;">Subtotal: Rs. <span id="inv-sub"></span></p>
+                    <p style="margin: 2px 0;">Delivery: Rs. <span id="inv-ship"></span></p>
+                    <h3 style="color: #f85606; margin: 5px 0;">Total: Rs. <span id="inv-total"></span></h3>
+                </div>
+                
+                <p style="text-align: center; font-size: 11px; margin-top: 15px; color: #888;">Thank you for your business!</p>
+                <button class="btn" onclick="window.print()" style="background: #444;">PRINT BILL</button>
+                <button class="btn" style="background: #666; margin-top: 5px;" onclick="location.reload()">DONE</button>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <button class="btn" style="width: 200px;" onclick="location.href='selection.html'">BACK TO MENU</button>
+        </div>
+
+        <div id="admin-panel" class="admin-panel">
+            <h3 style="text-align: center; color: #004a99;">OWNER DASHBOARD</h3>
+            <div style="background: #fff; padding: 20px; border-radius: 10px;">
+                <h4>Add New Part</h4>
+                <input type="file" id="p-file" accept="image/*" class="input-field" onchange="previewFile()">
+                <input type="text" id="p-name" placeholder="Part Name" class="input-field">
+                <input type="number" id="p-price" placeholder="Price" class="input-field">
+                <button class="btn" style="background: #28a745;" onclick="addNewProduct()">ADD PRODUCT</button>
+            </div>
+            <h4>Recent Orders</h4>
+            <div id="admin-orders-list"></div>
+        </div>
+    </div>
+
+    <script>
+        let base64Image = "";
+        let cart = [];
+        let currentSubtotal = 0;
+        let currentShipping = 0;
+        const ADMIN_EMAIL = "udarachandrasena2003@gmail.com";
+
+        window.onload = function() { renderStore(); checkAdmin(); };
+
+        function checkAdmin() {
+            if (localStorage.getItem("loggedUserEmail") === ADMIN_EMAIL) {
+                document.getElementById("admin-panel").style.display = "block";
+                renderAdminOrders();
+            }
+        }
+
+        function previewFile() {
+            const file = document.getElementById('p-file').files[0];
+            const reader = new FileReader();
+            reader.onloadend = () => base64Image = reader.result;
+            if (file) reader.readAsDataURL(file);
+        }
+
+        function addNewProduct() {
+            let name = document.getElementById("p-name").value;
+            let price = document.getElementById("p-price").value;
+            if(!name || !price || !base64Image) return alert("Fill all details!");
+            let products = JSON.parse(localStorage.getItem("smStoreData") || "[]");
+            products.push({ id: Date.now(), name, price, img: base64Image, ratings: [] });
+            localStorage.setItem("smStoreData", JSON.stringify(products));
+            location.reload();
+        }
+
+        function renderStore() {
+            let products = JSON.parse(localStorage.getItem("smStoreData") || "[]");
+            let display = document.getElementById("product-display");
+            display.innerHTML = products.map((p, pIndex) => {
+                let avg = (p.ratings && p.ratings.length > 0) ? p.ratings.reduce((s, r) => s + r, 0) / p.ratings.length : 0;
+                let roundedAvg = Math.round(avg);
+                return `<div class="product-card">
+                    <img src="${p.img}">
+                    <div style="font-weight:bold; margin:5px 0;">${p.name}</div>
+                    <div class="rating-stars">${[1,2,3,4,5].map(s => `<span class="${s<=roundedAvg?'active':''}" onclick="rateProduct(${pIndex}, ${s})">★</span>`).join("")} <span class="rating-count">(${p.ratings?p.ratings.length:0})</span></div>
+                    <div style="color:#f85606; font-weight:bold;">Rs. ${p.price}</div>
+                    <button class="btn" style="background:#f85606; font-size:12px; margin-top:10px;" onclick="addToCart(${pIndex})">ADD TO CART</button>
+                </div>`;
+            }).join("");
+        }
+
+        function rateProduct(idx, star) {
+            let p = JSON.parse(localStorage.getItem("smStoreData"));
+            if(!p[idx].ratings) p[idx].ratings = [];
+            p[idx].ratings.push(star);
+            localStorage.setItem("smStoreData", JSON.stringify(p));
+            renderStore();
+        }
+
+        function addToCart(idx) {
+            let p = JSON.parse(localStorage.getItem("smStoreData"));
+            cart.push(p[idx]);
+            document.getElementById("cart-count").innerText = cart.length;
+            updateCalculation();
+            alert(p[idx].name + " added!");
+        }
+
+        function updateCalculation() {
+            currentSubtotal = cart.reduce((s, i) => s + parseInt(i.price), 0);
+            if (cart.length === 0) currentShipping = 0;
+            else currentShipping = (currentSubtotal < 3500) ? 350 : Math.round(currentSubtotal * 0.1);
+            document.getElementById("items-subtotal").innerText = currentSubtotal.toLocaleString();
+            document.getElementById("bill-shipping").innerText = currentShipping.toLocaleString();
+            document.getElementById("bill-total").innerText = (currentSubtotal + currentShipping).toLocaleString();
+        }
+
+        function openCart() {
+            let list = document.getElementById("cart-items-list");
+            if(cart.length===0) list.innerHTML = "<p style='text-align:center;'>Empty Cart</p>";
+            else list.innerHTML = cart.map((i, idx) => `<div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:13px;"><span>${i.name}</span><span>Rs. ${i.price} <button class="remove-btn" onclick="removeFromCart(${idx})">ⓧ</button></span></div>`).join("");
+            document.getElementById("cartModal").style.display = "flex";
+        }
+
+        function removeFromCart(idx) { cart.splice(idx, 1); document.getElementById("cart-count").innerText = cart.length; updateCalculation(); openCart(); }
+        function clearCart() { cart = []; document.getElementById("cart-count").innerText = 0; updateCalculation(); closeModal('cartModal'); }
+        function closeModal(id) { document.getElementById(id).style.display = "none"; }
+
+        function processOrder() {
+            let name = document.getElementById("cust-name").value;
+            let phone = document.getElementById("cust-phone").value;
+            let addr = document.getElementById("cust-address").value;
+            if(!name || !phone || !addr || cart.length === 0) return alert("Fill all details!");
+
+            let orderData = { name, phone, addr, items: cart, subtotal: currentSubtotal, shipping: currentShipping, total: (currentSubtotal+currentShipping), date: new Date().toLocaleString() };
+            
+            let orders = JSON.parse(localStorage.getItem("smFinalOrders") || "[]");
+            orders.push(orderData);
+            localStorage.setItem("smFinalOrders", JSON.stringify(orders));
+
+            // පාරිභෝගිකයාට බිල පෙන්වීම
+            showInvoice(orderData);
+        }
+
+        function showInvoice(order) {
+            document.getElementById("cartModal").style.display = "none";
+            document.getElementById("inv-date").innerText = order.date;
+            document.getElementById("inv-cust-details").innerHTML = `${order.name}<br>${order.phone}<br>${order.addr}`;
+            document.getElementById("inv-items").innerHTML = order.items.map(i => `<tr><td style="border:1px solid #eee; padding:5px;">${i.name}</td><td style="border:1px solid #eee; padding:5px; text-align:right;">${i.price}</td></tr>`).join("");
+            document.getElementById("inv-sub").innerText = order.subtotal.toLocaleString();
+            document.getElementById("inv-ship").innerText = order.shipping.toLocaleString();
+            document.getElementById("inv-total").innerText = order.total.toLocaleString();
+            document.getElementById("invoiceModal").style.display = "flex";
+        }
+
+        function renderAdminOrders() {
+            let orders = JSON.parse(localStorage.getItem("smFinalOrders") || "[]");
+            document.getElementById("admin-orders-list").innerHTML = orders.reverse().map(o => `<div class="order-card"><strong>${o.name}</strong> (${o.phone})<br><small>${o.addr}</small><br>Items: ${o.items.map(i=>i.name).join(", ")}<br>Total: Rs. ${o.total}</div>`).join("");
+        }
+    </script>
+</body>
+</html>

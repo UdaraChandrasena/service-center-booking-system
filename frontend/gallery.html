@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gallery - S.M. Chandrasena</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Gallery එක සඳහා විශේෂිත ස්ටයිල් */
+        .gallery-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            width: 100%;
+            max-width: 1100px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            margin-top: 20px;
+        }
+        .gallery-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 15px;
+            transition: 0.3s;
+            cursor: pointer;
+            border: 2px solid #eee;
+        }
+        .gallery-item img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            border-color: #004a99;
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay">
+        <h2>OUR SERVICE CENTER GALLERY</h2>
+
+        <div class="gallery-container" id="gallery-box">
+            <!-- JavaScript මගින් පින්තූර මෙතනට ඇතුළත් වේ -->
+        </div>
+
+        <!-- Contact Section - මෙය Overlay එක ඇතුළතට ගෙන ඇත -->
+        <div class="contact-section" style="background: white; border: 1px solid #004a99; margin-top: 25px; padding: 15px; border-radius: 15px;">
+            <span class="contact-label">Call for More Information</span>
+            <p class="contact-info">070 178 0711 | 071 385 1137 | 074 071 9071</p>
+        </div>
+
+        <!-- එක බොත්තමක් පමණක් ඉතිරි කර ඇත -->
+        <button class="btn" onclick="location.href='index.html'" style="margin-top: 20px;">BACK TO HOME</button>
+    </div>
+
+    <script>
+        const galleryBox = document.getElementById('gallery-box');
+        const totalImages = 20; // පින්තූර ගණන අනුව මෙය වෙනස් කරන්න
+
+        for (let i = 1; i <= totalImages; i++) {
+            let div = document.createElement('div');
+            div.className = 'gallery-item';
+            
+            let img = document.createElement('img');
+            img.src = `images/img${i}.jpg`; // පින්තූර img1.jpg, img2.jpg ලෙස තිබිය යුතුය
+            
+            // පින්තූරයක් නොමැති නම් එම කොටස සඟවයි
+            img.onerror = function() {
+                this.parentElement.style.display = 'none';
+            };
+
+            div.appendChild(img);
+            galleryBox.appendChild(div);
+        }
+    </script>
+</body>
+</html>

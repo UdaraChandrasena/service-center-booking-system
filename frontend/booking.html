@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking - S.M. Service Center</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .box { background: white; padding: 25px; border-radius: 15px; width: 90%; max-width: 500px; margin: 20px auto; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        
+        /* Checkbox List Styles */
+        .service-selection { text-align: left; margin: 15px 0; max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 8px; background: #f9f9f9; }
+        .service-item { display: flex; align-items: center; margin-bottom: 10px; cursor: pointer; font-size: 14px; color: #333; }
+        .service-item input { margin-right: 10px; width: 18px; height: 18px; cursor: pointer; }
+
+        /* Time Grid Styles */
+        .time-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
+        .slot { padding: 10px; border: 1px solid #004a99; border-radius: 5px; cursor: pointer; text-align: center; font-size: 12px; transition: 0.3s; }
+        .slot.booked { background: #ccc; cursor: not-allowed; border: none; color: #666; }
+        .slot.selected { background: #004a99; color: white; }
+
+        /* Receipt Modal Styles */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 3000; justify-content: center; align-items: center; }
+        .receipt-box { background: white; padding: 25px; border-radius: 15px; width: 90%; max-width: 400px; border: 2px solid #004a99; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .receipt-header { border-bottom: 2px solid #004a99; padding-bottom: 10px; margin-bottom: 15px; text-align: center; }
+        .receipt-logo { width: 70px; margin-bottom: 5px; }
+        .receipt-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; border-bottom: 1px dashed #eee; padding-bottom: 5px; text-align: left; }
+        
+        @media print { .no-print { display: none; } }
+    </style>
+</head>
+<body>
+    <div class="overlay" style="overflow-y: auto; padding: 20px 0;">
+        <div class="box">
+            <h3 style="color: #004a99; text-align:center; margin-top: 0;">SERVICE BOOKING</h3>
+            
+            <input type="text" id="veh" placeholder="Vehicle No (e.g. WP ABC-1234)" class="input-field">
+            
+            <label style="font-weight:bold; color:#555; display:block; margin-top:10px; text-align: left;">Select Services Needed (Multiple):</label>
+            <div class="service-selection" id="service-list">
+                <label class="service-item"><input type="checkbox" value="Full Service"> Full Service</label>
+                <label class="service-item"><input type="checkbox" value="Oil Change"> Oil Change</label>
+                <label class="service-item"><input type="checkbox" value="Vehicle Inspection"> Vehicle Inspection</label>
+                <label class="service-item"><input type="checkbox" value="Engine Diagnostics"> Engine Diagnostics</label>
+                <label class="service-item"><input type="checkbox" value="Brake Repair"> Brake Repair</label>
+                <label class="service-item"><input type="checkbox" value="Battery Replacement"> Battery Replacement</label>
+                <label class="service-item"><input type="checkbox" value="Wheel Alignment"> Wheel Alignment</label>
+                <label class="service-item"><input type="checkbox" value="Electrical Repairs"> Electrical Repairs</label>
+                <label class="service-item"><input type="checkbox" id="other-check" onchange="toggleOther(this)"> Other (Special Request)</label>
+            </div>
+
+            <textarea id="oth" placeholder="Please specify other requirements here..." class="input-field" style="display:none; height:60px;"></textarea>
+            
+            <label style="font-weight:bold; color:#555; display:block; margin-top:10px; text-align: left;">Select Date:</label>
+            <input type="date" id="date" class="input-field" onchange="loadSlots()">
+            
+            <label style="font-weight:bold; color:#555; display:block; margin-top:10px; text-align: left;">Select Available Time:</label>
+            <div id="slots" class="time-grid">
+                <p style="font-size: 11px; color: #888; grid-column: span 3;">Please select a date to view time slots.</p>
+            </div>
+            
+            <button class="btn" onclick="book()" style="margin-top:20px;">CONFIRM BOOKING</button>
+            <button class="btn" onclick="location.href='selection.html'" style="background:#666;">BACK</button>
+        </div>
+    </div>
+
+    <div id="receiptModal" class="modal">
+        <div class="receipt-box">
+            <div class="receipt-header">
+                <img src="images/logo.png" class="receipt-logo" alt="S.M. Logo">
+                <h4 style="margin:0; color:#004a99;">S.M. CHANDRASENA</h4>
+                <small>Booking Confirmation Receipt</small>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <div class="receipt-row"><strong>Vehicle No:</strong> <span id="r-veh"></span></div>
+                <div class="receipt-row"><strong>Date:</strong> <span id="r-date"></span></div>
+                <div class="receipt-row"><strong>Time:</strong> <span id="r-time"></span></div>
+                
+                <div style="text-align: left; font-size: 13px; margin-top: 10px;">
+                    <strong>Selected Services:</strong>
+                    <ul id="r-services" style="margin: 5px 0; padding-left: 20px; color: #004a99; font-weight: 500;"></ul>
+                </div>
+            </div>
+
+            <p style="font-size: 11px; color: #777; text-align: center; border-top: 1px solid #eee; padding-top: 10px;">
+                Your appointment is confirmed. Please arrive on time.
+            </p>
+            
+            <div class="no-print">
+                <button class="btn" onclick="window.print()" style="background: #444;">PRINT RECEIPT</button>
+                <button class="btn" style="background: #004a99; margin-top: 5px;" onclick="location.href='selection.html'">FINISH</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selT = "";
+
+        function toggleOther(chk) {
+            document.getElementById('oth').style.display = chk.checked ? 'block' : 'none';
+        }
+        
+        function loadSlots() {
+            let d = document.getElementById("date").value;
+            let cont = document.getElementById("slots");
+            cont.innerHTML = ""; selT = "";
+            if(!d) return;
+
+            let bks = JSON.parse(localStorage.getItem("allBookings") || "[]");
+            let booked = bks.filter(b => b.date === d).map(b => b.time);
+
+            for(let h=8; h<17; h++) {
+                for(let m of ["00", "30"]) {
+                    let displayH = h > 12 ? h - 12 : h;
+                    let ampm = h >= 12 ? "PM" : "AM";
+                    let t = `${h<10?'0'+h:h}:${m}`;
+                    let displayT = `${displayH}:${m} ${ampm}`;
+                    
+                    let s = document.createElement("div");
+                    s.className = "slot" + (booked.includes(t) ? " booked" : "");
+                    s.innerText = displayT;
+                    
+                    if(!booked.includes(t)) {
+                        s.onclick = () => {
+                            document.querySelectorAll(".slot").forEach(x=>x.classList.remove("selected"));
+                            s.classList.add("selected"); selT = t;
+                        };
+                    } else {
+                        s.innerText += " (Full)";
+                    }
+                    cont.appendChild(s);
+                }
+            }
+        }
+
+        function book() {
+            let v = document.getElementById("veh").value;
+            let d = document.getElementById("date").value;
+            
+            // Get all selected checkboxes
+            let selectedServices = [];
+            document.querySelectorAll('#service-list input[type="checkbox"]:checked').forEach(cb => {
+                if(cb.value) selectedServices.push(cb.value);
+            });
+
+            // Add other details if the "Other" checkbox is checked
+            let otherCheck = document.getElementById("other-check");
+            let otherText = document.getElementById("oth").value;
+            if(otherCheck.checked && otherText) {
+                selectedServices.push("Other: " + otherText);
+            }
+
+            // Basic validation
+            if(!v) return alert("Please enter your Vehicle Number!");
+            if(selectedServices.length === 0) return alert("Please select at least one service!");
+            if(!d) return alert("Please select a date!");
+            if(!selT) return alert("Please select a time slot!");
+
+            // Save to LocalStorage for Admin
+            let bks = JSON.parse(localStorage.getItem("allBookings") || "[]");
+            bks.push({ 
+                vehicle: v, 
+                date: d, 
+                time: selT, 
+                services: selectedServices,
+                user: localStorage.getItem("loggedUserEmail")
+            });
+            localStorage.setItem("allBookings", JSON.stringify(bks));
+
+            // Populate the Receipt Modal
+            document.getElementById("r-veh").innerText = v;
+            document.getElementById("r-date").innerText = d;
+            document.getElementById("r-time").innerText = selT;
+            
+            let servList = document.getElementById("r-services");
+            servList.innerHTML = selectedServices.map(s => `<li>${s}</li>`).join("");
+            
+            // Show the Receipt
+            document.getElementById("receiptModal").style.display = "flex";
+        }
+    </script>
+</body>
+</html>

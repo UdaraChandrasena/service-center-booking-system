@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rate Us - S.M. Chandrasena</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .rating-card { background: white; padding: 40px; border-radius: 25px; text-align: center; width: 90%; max-width: 500px; }
+        .stars { font-size: 50px; color: #ccc; cursor: pointer; margin: 20px 0; }
+        .stars span.active { color: #ffcc00; }
+        .comment-box { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ccc; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="overlay">
+        <div class="rating-card">
+            <h2>TELL US WHAT YOU THINK</h2>
+            <div class="stars" id="star-container">
+                <span onclick="setRating(1)">★</span><span onclick="setRating(2)">★</span>
+                <span onclick="setRating(3)">★</span><span onclick="setRating(4)">★</span>
+                <span onclick="setRating(5)">★</span>
+            </div>
+            <textarea id="user-comment" class="comment-box" rows="3" placeholder="How was our service?"></textarea>
+            <button class="btn" style="width: 100%; margin-top: 20px;" onclick="submitFeedback()">SUBMIT REVIEW</button>
+            <br>
+            <a href="index.html" class="link" style="display:inline-block; margin-top:15px;">Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        let currentRating = 0;
+        function setRating(n) {
+            currentRating = n;
+            let stars = document.getElementById("star-container").children;
+            for (let i = 0; i < 5; i++) stars[i].classList.toggle("active", i < n);
+        }
+
+        function submitFeedback() {
+            if (currentRating === 0) { alert("Please select stars!"); return; }
+            let feedbacks = JSON.parse(localStorage.getItem("allFeedbacks") || "[]");
+            feedbacks.push({
+                rating: currentRating,
+                comment: document.getElementById("user-comment").value,
+                date: new Date().toLocaleDateString()
+            });
+            localStorage.setItem("allFeedbacks", JSON.stringify(feedbacks));
+            alert("Thank you! Your review is now live.");
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>

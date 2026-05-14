@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Signup - S.M. Service Center</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .show-pw { display: flex; align-items: center; color: white; font-size: 13px; margin: 5px 0 15px 0; width: 80%; }
+        .show-pw input { width: auto; margin-right: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="overlay">
+        <div class="main-container">
+            <h2>CREATE ACCOUNT</h2>
+            <input type="text" id="fname" placeholder="Full Name" class="input-field">
+            <input type="email" id="email" placeholder="Email Address" class="input-field">
+            <input type="tel" id="phone" placeholder="Phone Number" class="input-field">
+            <input type="password" id="pass" placeholder="Password" class="input-field">
+            
+            <div class="show-pw">
+                <input type="checkbox" onclick="document.getElementById('pass').type = this.checked ? 'text' : 'password'">
+                <label>Show Password</label>
+            </div>
+
+            <button class="btn" onclick="signup()">SIGN UP & ENTER</button>
+            <p style="color: rgb(170, 97, 97); margin-top: 15px;">Already have an account? <a href="login.html" style="color: #ffcc00;">Login</a></p>
+        </div>
+    </div>
+    <script>
+        function signup() {
+            let fname = document.getElementById("fname").value;
+            let email = document.getElementById("email").value;
+            let phone = document.getElementById("phone").value;
+            let pass = document.getElementById("pass").value;
+            if(!fname || !email || !phone || !pass) return alert("Fill all fields!");
+            let users = JSON.parse(localStorage.getItem("allUsers") || "[]");
+            if(users.find(u => u.email === email)) return alert("Email already exists!");
+            users.push({ fname, email, phone, pass });
+            localStorage.setItem("allUsers", JSON.stringify(users));
+            localStorage.setItem("loggedUserEmail", email);
+            window.location.href = "selection.html";
+        }
+    </script>
+</body>
+</html>
